@@ -1,0 +1,12 @@
+# Binaries
+**/bin
+**/obj
+
+# Visual Studio files
+**/.vs
+
+# JSON files
+*.json
+
+# Environment variables
+.env

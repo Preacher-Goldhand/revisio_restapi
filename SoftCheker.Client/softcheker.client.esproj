@@ -10,6 +10,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="src\Layout\" />
+    <Folder Include="src\Dashboard\" />
+    <Folder Include="src\Shared\" />
     <Folder Include="src\services\" />
   </ItemGroup>
 </Project>

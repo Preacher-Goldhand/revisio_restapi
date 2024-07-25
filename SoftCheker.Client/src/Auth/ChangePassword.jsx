@@ -1,24 +1,26 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom';
-import { isAuthenticated } from '../utils/authUtils';
+import { useNavigate } from 'react-router-dom';
 
-const Login = () => {
+const ChangePassword = () => {
     const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         try {
-            const response = await axios.post('http://localhost:5180/api/account/login', { username, password });
-            localStorage.setItem('token', response.data.token);
-            alert('Udane logowanie');
-            if (isAuthenticated()) {
-                navigate('/register');
-            }
+            await axios.post('http://localhost:5180/api/account/change-password', {
+                userName: username,
+                currentPassword,
+                newPassword
+            });
+            alert('Udana zmiana hasla');
+            navigate('/login');
         } catch (error) {
-            alert('Blad logowania');
+            alert('Bledna zmiana hasla');
         }
     };
 
@@ -39,7 +41,7 @@ const Login = () => {
                 width: '100%',
                 maxWidth: '400px'
             }}>
-                <h2 className="my-4">Logowanie</h2>
+                <h2 className="my-4">Zmiana hasla</h2>
                 <form onSubmit={handleSubmit} className="form-group">
                     <div className="mb-3">
                         <input
@@ -50,27 +52,38 @@ const Login = () => {
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             required
-                            style={{ maxWidth: '100%' }} 
+                            style={{ maxWidth: '100%' }}
                         />
                     </div>
                     <div className="mb-3">
                         <input
                             type="password"
-                            id="password"
+                            id="currentPassword"
                             className="form-control"
-                            placeholder="Haslo"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Aktualne haslo"
+                            value={currentPassword}
+                            onChange={(e) => setCurrentPassword(e.target.value)}
                             required
-                            style={{ maxWidth: '100%' }} 
+                            style={{ maxWidth: '100%' }}
                         />
                     </div>
-                    <button type="submit" className="btn btn-primary">Zaloguj sie</button>
+                    <div className="mb-3">
+                        <input
+                            type="password"
+                            id="newPassword"
+                            className="form-control"
+                            placeholder="Nowe haslo"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            required
+                            style={{ maxWidth: '100%' }}
+                        />
+                    </div>
+                    <button type="submit" className="btn btn-primary">OK</button>
                 </form>
-                <p className="mt-3">Zmiana hasla <Link to="/resetPassword">Zmien haslo</Link></p>
             </div>
         </div>
     );
 };
 
-export default Login;
+export default ChangePassword;

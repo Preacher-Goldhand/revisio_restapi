@@ -12,11 +12,10 @@ const Register = () => {
         e.preventDefault();
         try {
             await axios.post('http://localhost:5180/api/account/register', { username, email, password });
-            alert('Registration successful!');
+            alert('Udana rejestracja');
             navigate('/login');
         } catch (error) {
-            console.error('Registration error:', error);
-            alert('Registration failed!');
+            alert('Bledna rejestracja');
         }
     };
 
@@ -37,15 +36,14 @@ const Register = () => {
                 width: '100%',
                 maxWidth: '400px'
             }}>
-                <h2 className="my-4">Register</h2>
+                <h2 className="my-4">Dodawanie uzytkownika</h2>
                 <form onSubmit={handleSubmit} className="form-group">
                     <div className="mb-3">
-                        <label htmlFor="username" className="form-label">Username</label>
                         <input
                             type="text"
                             id="username"
                             className="form-control"
-                            placeholder="Username"
+                            placeholder="Nazwa uzytkownika"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             required
@@ -53,7 +51,6 @@ const Register = () => {
                         />
                     </div>
                     <div className="mb-3">
-                        <label htmlFor="email" className="form-label">Email</label>
                         <input
                             type="email"
                             id="email"
@@ -66,21 +63,19 @@ const Register = () => {
                         />
                     </div>
                     <div className="mb-3">
-                        <label htmlFor="password" className="form-label">Password</label>
                         <input
                             type="password"
                             id="password"
                             className="form-control"
-                            placeholder="Password"
+                            placeholder="Haslo"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
                             style={{ maxWidth: '100%' }} 
                         />
                     </div>
-                    <button type="submit" className="btn btn-primary">Register</button>
+                    <button type="submit" className="btn btn-primary">Dodaj</button>
                 </form>
-                <p className="mt-3">Already have an account? <Link to="/login">Login</Link></p>
             </div>
         </div>
     );

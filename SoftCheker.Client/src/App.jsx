@@ -4,19 +4,25 @@ import Register from './Auth/Register';
 import Login from './Auth/Login';
 import Navbar from './Layout/Navbar';
 import { isAuthenticated } from './utils/authUtils';
+import ChangePassword from './Auth/ChangePassword';
+import UserList from './Dashboard/UserList';
+import SmtpConfig from './Dashboard/SmtpConfig';
 
 const AppRoutes = () => {
     const location = useLocation();
     const userIsAuthenticated = isAuthenticated();
-    const showNavbar = userIsAuthenticated && !['/', '/login'].includes(location.pathname);
+    const showNavbar = userIsAuthenticated && !['/', '/resetPassword'].includes(location.pathname);
 
     return (
         <>
             {showNavbar && <Navbar />}
             <div className="container">
                 <Routes>
-                    <Route path="/" element={<Register />} />
-                    <Route path="/login" element={<Login />} />
+                    <Route path="/" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/resetPassword" element={<ChangePassword />} />
+                    <Route path="/users" element={<UserList />} />
+                    <Route path="/smtp" element={<SmtpConfig />} />
                 </Routes>
             </div>
         </>

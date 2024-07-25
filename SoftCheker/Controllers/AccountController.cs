@@ -62,5 +62,37 @@ namespace SoftCheker.Server.Controllers
             var result = await _userManager.DeleteAsync(user);
             return Ok();
         }
+
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] PasswordChangeDTO model)
+        {
+            var user = await _userManager.FindByNameAsync(model.UserName);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+
+            return BadRequest(result.Errors);
+        }
+
+        [HttpGet("users")]
+        [Authorize]
+        public async Task<IActionResult> GetUsers()
+        {
+            var users = _userManager.Users.Select(user => new UserDTO
+            {
+                UserName = user.UserName,
+                Email = user.Email
+            }).ToList();
+
+            return Ok(users);
+        }
+
     }
 }

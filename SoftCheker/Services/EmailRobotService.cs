@@ -53,7 +53,7 @@ namespace SoftCheker.Server.Services
                 }
 
                 _logger.LogInformation("Waiting ...");
-                await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken);
+                await Task.Delay(TimeSpan.FromHours(24), stoppingToken);
             }
 
             _logger.LogInformation("Email Background Service has stopped.");

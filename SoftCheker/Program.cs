@@ -100,8 +100,8 @@ using (var scope = app.Services.CreateScope())
 
     var defaultUser = new IdentityUser
     {
-        UserName = "techuser",
-        Email = "techuser@cennam.com.pl"
+        UserName = "admin",
+        Email = "admin@cennam.com.pl"
     };
 
     string userPassword = Env.GetString("ADMIN_PASSWORD");

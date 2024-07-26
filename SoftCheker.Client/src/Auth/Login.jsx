@@ -15,7 +15,7 @@ const Login = () => {
             localStorage.setItem('token', response.data.token);
             alert('Udane logowanie');
             if (isAuthenticated()) {
-                navigate('/register');
+                navigate('/certs');
             }
         } catch (error) {
             alert('Blad logowania');

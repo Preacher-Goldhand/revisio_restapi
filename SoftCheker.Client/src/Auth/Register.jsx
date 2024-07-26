@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
     const [username, setUsername] = useState('');
@@ -15,8 +15,12 @@ const Register = () => {
             alert('Udana rejestracja');
             navigate('/login');
         } catch (error) {
-            alert('Bledna rejestracja');
+            alert('B³êdna rejestracja');
         }
+    };
+
+    const handleCancel = () => {
+        navigate('/users');
     };
 
     return (
@@ -47,7 +51,7 @@ const Register = () => {
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             required
-                            style={{ maxWidth: '100%' }} 
+                            style={{ maxWidth: '100%' }}
                         />
                     </div>
                     <div className="mb-3">
@@ -59,7 +63,7 @@ const Register = () => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
-                            style={{ maxWidth: '100%' }} 
+                            style={{ maxWidth: '100%' }}
                         />
                     </div>
                     <div className="mb-3">
@@ -71,10 +75,13 @@ const Register = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
-                            style={{ maxWidth: '100%' }} 
+                            style={{ maxWidth: '100%' }}
                         />
                     </div>
-                    <button type="submit" className="btn btn-primary">Dodaj</button>
+                    <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '10px' }}>
+                        <button type="submit" className="btn btn-primary">OK</button>
+                        <button type="button" onClick={handleCancel} className="btn btn-secondary">Anuluj</button>
+                    </div>
                 </form>
             </div>
         </div>

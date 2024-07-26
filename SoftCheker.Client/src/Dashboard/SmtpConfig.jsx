@@ -4,7 +4,7 @@ import axios from 'axios';
 const SmtpConfig = () => {
     const [smtpConfig, setSmtpConfig] = useState({
         SmtpServer: '',
-        SmtpPort: 0,
+        SmtpPort: '',
         UseSsl: false,
         SmtpUsername: '',
         SmtpPassword: '',
@@ -20,7 +20,14 @@ const SmtpConfig = () => {
                 const response = await axios.get('http://localhost:5180/api/smtpconfig', {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
-                setSmtpConfig(response.data);
+                setSmtpConfig({
+                    SmtpServer: response.data.smtpServer || '',
+                    SmtpPort: response.data.smtpPort != null ? response.data.smtpPort.toString() : '',
+                    UseSsl: response.data.useSsl || false,
+                    SmtpUsername: response.data.smtpUsername || '',
+                    SmtpPassword: response.data.smtpPassword || '', 
+                    RecipientEmail: response.data.recipientEmail || ''
+                });
             } catch (err) {
                 setError('Failed to load SMTP configuration.');
             } finally {
@@ -42,12 +49,15 @@ const SmtpConfig = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.put('http://localhost:5180/api/smtpconfig', smtpConfig, {
+            await axios.put('http://localhost:5180/api/smtpconfig', {
+                ...smtpConfig,
+                SmtpPort: parseInt(smtpConfig.SmtpPort, 10) 
+            }, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
-            alert('SMTP configuration updated successfully.');
+            alert('Udana konfiguracja SMTP');
         } catch (err) {
-            setError('Failed to update SMTP configuration.');
+            setError('Blad konfiguracji SMTP');
         }
     };
 
@@ -55,38 +65,34 @@ const SmtpConfig = () => {
     if (error) return <div>{error}</div>;
 
     return (
-        <div style={{ padding: '20px' }}>
-            <h2>Konfiguracja SMTP</h2>
-            <form onSubmit={handleSubmit}>
-                <div style={{ marginBottom: '10px' }}>
-                    <label>
-                        Serwer SMTP:
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', padding: '20px' }}>
+            <div style={{ maxWidth: '500px', width: '100%' }}>
+                <h2 style={{ textAlign: 'center', marginBottom: '50px' }}>Konfiguracja SMTP</h2>
+                <form onSubmit={handleSubmit}>
+                    <div style={{ marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
+                        <label style={{ flex: '0 0 150px' }}>Serwer SMTP:</label>
                         <input
                             type="text"
                             name="SmtpServer"
                             value={smtpConfig.SmtpServer}
                             onChange={handleChange}
                             placeholder="smtp.example.com"
-                            style={{ marginLeft: '10px', width: '300px', padding: '8px' }}
+                            style={{ flex: '1', padding: '8px' }}
                         />
-                    </label>
-                </div>
-                <div style={{ marginBottom: '10px' }}>
-                    <label>
-                        SMTP Port:
+                    </div>
+                    <div style={{ marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
+                        <label style={{ flex: '0 0 150px' }}>Port SMTP:</label>
                         <input
-                            type="number"
+                            type="text"
                             name="SmtpPort"
                             value={smtpConfig.SmtpPort}
                             onChange={handleChange}
                             placeholder="587"
-                            style={{ marginLeft: '10px', width: '100px', padding: '8px' }}
+                            style={{ flex: '1', padding: '8px' }}
                         />
-                    </label>
-                </div>
-                <div style={{ marginBottom: '10px' }}>
-                    <label>
-                        SSL:
+                    </div>
+                    <div style={{ marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
+                        <label style={{ flex: '0 0 150px' }}>SSL:</label>
                         <input
                             type="checkbox"
                             name="UseSsl"
@@ -94,51 +100,45 @@ const SmtpConfig = () => {
                             onChange={handleChange}
                             style={{ marginLeft: '10px' }}
                         />
-                    </label>
-                </div>
-                <div style={{ marginBottom: '10px' }}>
-                    <label>
-                        Uzytkownik SMTP:
+                    </div>
+                    <div style={{ marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
+                        <label style={{ flex: '0 0 150px' }}>Uzytkownik SMTP:</label>
                         <input
                             type="text"
                             name="SmtpUsername"
                             value={smtpConfig.SmtpUsername}
                             onChange={handleChange}
                             placeholder="your_username"
-                            style={{ marginLeft: '10px', width: '300px', padding: '8px' }}
+                            style={{ flex: '1', padding: '8px' }}
                         />
-                    </label>
-                </div>
-                <div style={{ marginBottom: '10px' }}>
-                    <label>
-                        Haslo SMTP:
+                    </div>
+                    <div style={{ marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
+                        <label style={{ flex: '0 0 150px' }}>Haslo SMTP:</label>
                         <input
                             type="password"
                             name="SmtpPassword"
                             value={smtpConfig.SmtpPassword}
                             onChange={handleChange}
-                            placeholder="your_password"
-                            style={{ marginLeft: '10px', width: '300px', padding: '8px' }}
+                            placeholder="************"
+                            style={{ flex: '1', padding: '8px' }}
                         />
-                    </label>
-                </div>
-                <div style={{ marginBottom: '10px' }}>
-                    <label>
-                        Adres email odbiorcy:
+                    </div>
+                    <div style={{ marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
+                        <label style={{ flex: '0 0 150px' }}>Email odbiorcy:</label>
                         <input
                             type="email"
                             name="RecipientEmail"
                             value={smtpConfig.RecipientEmail}
                             onChange={handleChange}
                             placeholder="recipient@example.com"
-                            style={{ marginLeft: '10px', width: '300px', padding: '8px' }}
+                            style={{ flex: '1', padding: '8px' }}
                         />
-                    </label>
-                </div>
-                <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '4px' }}>
-                    Update
-                </button>
-            </form>
+                    </div>
+                    <button type="submit" style={{ display: 'block', width: '20%', padding: '10px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                        OK
+                    </button>
+                </form>
+            </div>
         </div>
     );
 };

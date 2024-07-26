@@ -7,6 +7,7 @@ import { isAuthenticated } from './utils/authUtils';
 import ChangePassword from './Auth/ChangePassword';
 import UserList from './Dashboard/UserList';
 import SmtpConfig from './Dashboard/SmtpConfig';
+import CertList from "./Dashboard/CertList"
 
 const AppRoutes = () => {
     const location = useLocation();
@@ -23,6 +24,7 @@ const AppRoutes = () => {
                     <Route path="/resetPassword" element={<ChangePassword />} />
                     <Route path="/users" element={<UserList />} />
                     <Route path="/smtp" element={<SmtpConfig />} />
+                    <Route path="/certs" element={<CertList />} />
                 </Routes>
             </div>
         </>

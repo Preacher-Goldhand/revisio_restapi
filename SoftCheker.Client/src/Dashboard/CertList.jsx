@@ -11,7 +11,7 @@ const CertList = () => {
     const [query, setQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(5);  
+    const [itemsPerPage, setItemsPerPage] = useState(5);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [showAddForm, setShowAddForm] = useState(false);
@@ -98,6 +98,30 @@ const CertList = () => {
         }
     };
 
+    const handleGenerateReport = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setError('Brak tokenu autoryzacyjnego.');
+            return;
+        }
+
+        try {
+            const response = await axios.get('http://localhost:5180/api/csv/generate-report', {
+                headers: { 'Authorization': `Bearer ${token}` },
+                responseType: 'blob'
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'report.xlsx');
+            document.body.appendChild(link);
+            link.click();
+        } catch (err) {
+            setError('Failed to generate report. SprawdŸ konsolê dla wiêcej informacji.');
+        }
+    };
+
     const currentCerts = filteredCerts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     if (loading) return <div>Loading...</div>;
@@ -106,12 +130,18 @@ const CertList = () => {
     return (
         <div style={{ padding: '20px' }}>
             <SearchBar query={query} onQueryChange={handleQueryChange} />
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+            <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '10px', marginBottom: '20px' }}>
                 <button
                     onClick={handleAddCertClick}
                     className="btn btn-primary"
                 >
                     Dodaj certyfikat
+                </button>
+                <button
+                    onClick={handleGenerateReport}
+                    className="btn btn-secondary"
+                >
+                    Generuj raport
                 </button>
             </div>
 

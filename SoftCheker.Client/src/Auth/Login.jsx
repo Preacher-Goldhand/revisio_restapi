@@ -67,7 +67,6 @@ const Login = () => {
                     </div>
                     <button type="submit" className="btn btn-primary">Zaloguj sie</button>
                 </form>
-                <p className="mt-3">Zmiana hasla <Link to="/resetPassword">Zmien haslo</Link></p>
             </div>
         </div>
     );

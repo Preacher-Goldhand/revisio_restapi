@@ -4,9 +4,10 @@
 
 # Visual Studio files
 **/.vs
-
-# JSON files
-*.json
+**/.vscode
 
 # Environment variables
 .env
+
+# Package JSON (lock)
+package-lock.json

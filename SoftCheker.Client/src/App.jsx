@@ -8,6 +8,7 @@ import ChangePassword from './Auth/ChangePassword';
 import UserList from './Dashboard/UserList';
 import SmtpConfig from './Dashboard/SmtpConfig';
 import CertList from "./Dashboard/CertList"
+import ContractList from "./Dashboard/ContractList"
 
 const AppRoutes = () => {
     const location = useLocation();
@@ -25,6 +26,7 @@ const AppRoutes = () => {
                     <Route path="/users" element={<UserList />} />
                     <Route path="/smtp" element={<SmtpConfig />} />
                     <Route path="/certs" element={<CertList />} />
+                    <Route path="/contracts" element={<ContractList />} />
                 </Routes>
             </div>
         </>

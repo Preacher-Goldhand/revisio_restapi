@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const AddCert = ({ onClose, cert, onSave }) => {
+const AddEditCert = ({ onClose, cert, onSave }) => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [issuedDate, setIssuedDate] = useState('');
@@ -54,7 +54,6 @@ const AddCert = ({ onClose, cert, onSave }) => {
                 onClose();
             }, 1000);
         } catch (err) {
-            console.error('Error saving certificate:', err.message);
             setError('Failed to save certificate. SprawdŸ konsolê dla wiêcej informacji.');
         }
     };
@@ -143,4 +142,4 @@ const AddCert = ({ onClose, cert, onSave }) => {
     );
 };
 
-export default AddCert;
+export default AddEditCert;

@@ -3,11 +3,11 @@ import axios from 'axios';
 import Pagination from '../Shared/Pagination';
 import SearchBar from '../Shared/Searchbar';
 import HighlightedText from '../Shared/HighlightedText';
-import AddEditCert from './Subforms/AddEditCert';
+import AddEditContract from './Subforms/AddEditContract';
 
-const CertList = () => {
-    const [certs, setCerts] = useState([]);
-    const [filteredCerts, setFilteredCerts] = useState([]);
+const ContractList = () => {
+    const [contracts, setContracts] = useState([]);
+    const [filteredContracts, setFilteredContracts] = useState([]);
     const [query, setQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -15,9 +15,9 @@ const CertList = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [showAddForm, setShowAddForm] = useState(false);
-    const [editCert, setEditCert] = useState(null);
+    const [editContract, setEditContract] = useState(null);
 
-    const fetchCerts = async () => {
+    const fetchContracts = async () => {
         const token = localStorage.getItem('token');
         if (!token) {
             setError('Brak tokenu autoryzacyjnego.');
@@ -26,31 +26,31 @@ const CertList = () => {
         }
 
         try {
-            const response = await axios.get('http://localhost:5180/api/cert', {
+            const response = await axios.get('http://localhost:5180/api/contract', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            setCerts(response.data);
+            setContracts(response.data);
             setTotalPages(Math.ceil(response.data.length / itemsPerPage));
             setLoading(false);
         } catch (err) {
-            setError('Failed to load certificates. SprawdŸ konsolê dla wiêcej informacji.');
+            setError('Failed to load contracts. SprawdŸ konsolê dla wiêcej informacji.');
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchCerts();
+        fetchContracts();
     }, [itemsPerPage]);
 
     useEffect(() => {
-        const filtered = certs.filter(cert =>
-            cert.name.toLowerCase().includes(query.toLowerCase()) ||
-            cert.description.toLowerCase().includes(query.toLowerCase())
+        const filtered = contracts.filter(contract =>
+            contract.contractNumber.toLowerCase().includes(query.toLowerCase()) ||
+            contract.description.toLowerCase().includes(query.toLowerCase())
         );
-        setFilteredCerts(filtered);
+        setFilteredContracts(filtered);
         setTotalPages(Math.ceil(filtered.length / itemsPerPage));
         setCurrentPage(1);
-    }, [query, certs, itemsPerPage]);
+    }, [query, contracts, itemsPerPage]);
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
@@ -60,13 +60,13 @@ const CertList = () => {
         setQuery(newQuery);
     };
 
-    const handleAddCertClick = () => {
-        setEditCert(null);
+    const handleAddContractClick = () => {
+        setEditContract(null);
         setShowAddForm(true);
     };
 
-    const handleEditCertClick = (cert) => {
-        setEditCert(cert);
+    const handleEditContractClick = (contract) => {
+        setEditContract(contract);
         setShowAddForm(true);
     };
 
@@ -75,11 +75,11 @@ const CertList = () => {
     };
 
     const handleSave = () => {
-        fetchCerts();
+        fetchContracts();
         setShowAddForm(false);
     };
 
-    const handleDeleteCert = async (id) => {
+    const handleDeleteContract = async (id) => {
         const token = localStorage.getItem('token');
         if (!token) {
             setError('Brak tokenu autoryzacyjnego.');
@@ -87,14 +87,14 @@ const CertList = () => {
         }
 
         try {
-            await axios.delete(`http://localhost:5180/api/cert/${id}`, {
+            await axios.delete(`http://localhost:5180/api/contract/${id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            setCerts(certs.filter(cert => cert.id !== id));
-            setFilteredCerts(filteredCerts.filter(cert => cert.id !== id));
-            setTotalPages(Math.ceil(filteredCerts.length / itemsPerPage));
+            setContracts(contracts.filter(contract => contract.id !== id));
+            setFilteredContracts(filteredContracts.filter(contract => contract.id !== id));
+            setTotalPages(Math.ceil(filteredContracts.length / itemsPerPage));
         } catch (err) {
-            setError('Failed to delete certificate. SprawdŸ konsolê dla wiêcej informacji.');
+            setError('Failed to delete contract. SprawdŸ konsolê dla wiêcej informacji.');
         }
     };
 
@@ -122,7 +122,7 @@ const CertList = () => {
         }
     };
 
-    const currentCerts = filteredCerts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    const currentContracts = filteredContracts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>{error}</div>;
@@ -132,10 +132,10 @@ const CertList = () => {
             <SearchBar query={query} onQueryChange={handleQueryChange} />
             <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '10px', marginBottom: '20px' }}>
                 <button
-                    onClick={handleAddCertClick}
+                    onClick={handleAddContractClick}
                     className="btn btn-primary"
                 >
-                    Dodaj certyfikat
+                    Dodaj kontrakt
                 </button>
                 <button
                     onClick={handleGenerateReport}
@@ -149,31 +149,35 @@ const CertList = () => {
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Nazwa</th>
+                        <th>Numer kontraktu</th>
                         <th>Opis</th>
-                        <th>Data wystawienia</th>
-                        <th>Data wygasniecia</th>
+                        <th>Data utworzenia</th>
+                        <th>Data zakomczenia</th>
+                        <th>Data odnowienia</th>
+                        <th>Cena brutto</th>
                         <th>Akcje</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {currentCerts.length === 0 ? (
+                    {currentContracts.length === 0 ? (
                         <tr>
-                            <td colSpan="6" style={{ textAlign: 'center', padding: '8px' }}>Brak certyfikatów</td>
+                            <td colSpan="8" style={{ textAlign: 'center', padding: '8px' }}>Brak kontraktów</td>
                         </tr>
                     ) : (
-                        currentCerts.map(cert => (
-                            <tr key={cert.id}>
-                                <td>{cert.id}</td>
-                                <td><HighlightedText text={cert.name} query={query} /></td>
-                                <td><HighlightedText text={cert.description} query={query} /></td>
-                                <td>{new Date(cert.issuedDate).toLocaleDateString()}</td>
-                                <td>{new Date(cert.expiredDate).toLocaleDateString()}</td>
+                        currentContracts.map(contract => (
+                            <tr key={contract.id}>
+                                <td>{contract.id}</td>
+                                <td><HighlightedText text={contract.contractNumber} query={query} /></td>
+                                <td><HighlightedText text={contract.description} query={query} /></td>
+                                <td>{new Date(contract.startDate).toLocaleDateString()}</td>
+                                <td>{new Date(contract.endDate).toLocaleDateString()}</td>
+                                <td>{new Date(contract.renewDate).toLocaleDateString()}</td>
+                                <td>{contract.grossPrice.toFixed(2)} PLN</td>
                                 <td>
-                                    <button onClick={() => handleEditCertClick(cert)} className="btn btn-primary btn-sm">
+                                    <button onClick={() => handleEditContractClick(contract)} className="btn btn-primary btn-sm">
                                         Edytuj
                                     </button>
-                                    <button onClick={() => handleDeleteCert(cert.id)} className="btn btn-danger btn-sm" style={{ marginLeft: '10px' }}>
+                                    <button onClick={() => handleDeleteContract(contract.id)} className="btn btn-danger btn-sm" style={{ marginLeft: '10px' }}>
                                         Usun
                                     </button>
                                 </td>
@@ -205,9 +209,9 @@ const CertList = () => {
                 />
             </div>
 
-            {showAddForm && <AddEditCert onClose={handleCloseAddForm} cert={editCert} onSave={handleSave} />}
+            {showAddForm && <AddEditContract onClose={handleCloseAddForm} contract={editContract} onSave={handleSave} />}
         </div>
     );
 };
 
-export default CertList;
+export default ContractList;

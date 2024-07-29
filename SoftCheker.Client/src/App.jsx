@@ -10,6 +10,7 @@ import SmtpConfig from './Dashboard/SmtpConfig';
 import CertList from "./Dashboard/CertList"
 import ContractList from "./Dashboard/ContractList"
 import DomainList from "./Dashboard/DomainList"
+import SoftList from "./Dashboard/SoftList"
 
 const AppRoutes = () => {
     const location = useLocation();
@@ -29,6 +30,7 @@ const AppRoutes = () => {
                     <Route path="/certs" element={<CertList />} />
                     <Route path="/contracts" element={<ContractList />} />
                     <Route path="/domains" element={<DomainList />} />
+                    <Route path="/softs" element={<SoftList />} />
                 </Routes>
             </div>
         </>

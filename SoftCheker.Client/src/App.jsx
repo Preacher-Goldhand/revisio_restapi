@@ -9,6 +9,7 @@ import UserList from './Dashboard/UserList';
 import SmtpConfig from './Dashboard/SmtpConfig';
 import CertList from "./Dashboard/CertList"
 import ContractList from "./Dashboard/ContractList"
+import DomainList from "./Dashboard/DomainList"
 
 const AppRoutes = () => {
     const location = useLocation();
@@ -27,6 +28,7 @@ const AppRoutes = () => {
                     <Route path="/smtp" element={<SmtpConfig />} />
                     <Route path="/certs" element={<CertList />} />
                     <Route path="/contracts" element={<ContractList />} />
+                    <Route path="/domains" element={<DomainList />} />
                 </Routes>
             </div>
         </>

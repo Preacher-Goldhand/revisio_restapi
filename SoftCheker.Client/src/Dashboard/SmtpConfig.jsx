@@ -151,7 +151,7 @@ const SmtpConfig = () => {
                             OK
                         </button>
                         <button type="button" onClick={handleTestEmail} style={{ padding: '10px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                            Testuj e-mail
+                            Testuj email
                         </button>
                     </div>
                     {testEmailStatus && <div style={{ marginTop: '10px' }}>{testEmailStatus}</div>}

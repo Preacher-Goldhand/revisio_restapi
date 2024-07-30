@@ -9,5 +9,6 @@
         public DateTime BasicSupport { get; set; }
         public DateTime ExtendedSupport { get; set; }
         public string NextVersion { get; set; }
+        public bool EmailCanceled { get; set; }
     }
 }

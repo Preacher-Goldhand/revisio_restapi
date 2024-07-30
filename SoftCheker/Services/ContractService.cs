@@ -2,8 +2,6 @@
 using SoftCheker.Server.Entities;
 using SoftCheker.Server.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace SoftCheker.Server.Services
 {
@@ -14,6 +12,7 @@ namespace SoftCheker.Server.Services
         Task<ContractDTO> CreateContractAsync(ContractDTO contractDto);
         Task<ContractDTO> UpdateContractAsync(int id, ContractDTO contractDto);
         Task DeleteContractAsync(int id);
+        Task CancelEmailAsync(int id);
     }
 
     public class ContractService : IContractService
@@ -70,6 +69,13 @@ namespace SoftCheker.Server.Services
                 _context.Contracts.Remove(contract);
                 await _context.SaveChangesAsync();
             }
+        }
+        public async Task CancelEmailAsync(int id)
+        {
+            var contract = await _context.Contracts.FindAsync(id);
+            contract.EmailCanceled = true;
+            _context.Contracts.Update(contract);
+            await _context.SaveChangesAsync();
         }
     }
 }

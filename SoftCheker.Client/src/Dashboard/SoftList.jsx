@@ -123,6 +123,24 @@ const SoftList = () => {
         }
     };
 
+    const handleCancelEmail = async (id) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setError('Brak tokenu autoryzacyjnego.');
+            return;
+        }
+
+        try {
+            await axios.post(`http://localhost:5180/api/soft/cancel-email/${id}`, null, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            alert('E-mail anulowany!');
+            fetchSofts();  
+        } catch (err) {
+            alert('Failed to cancel email.');
+        }
+    };
+
     const currentSofts = filteredSofts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     if (loading) return <div>Loading...</div>;
@@ -155,14 +173,14 @@ const SoftList = () => {
                         <th>Wersja</th>
                         <th>Data podstawowego wsparcia</th>
                         <th>Data rozszerzonego wsparcia</th>
-                        <th>Nastepna wersja</th>
+                        <th>Nastêpna wersja</th>
                         <th>Akcje</th>
                     </tr>
                 </thead>
                 <tbody>
                     {currentSofts.length === 0 ? (
                         <tr>
-                            <td colSpan="8" style={{ textAlign: 'center', padding: '8px' }}>Brak softów</td>
+                            <td colSpan="8" style={{ textAlign: 'center', padding: '8px' }}>Brak platform</td>
                         </tr>
                     ) : (
                         currentSofts.map(soft => (
@@ -181,6 +199,11 @@ const SoftList = () => {
                                     <button onClick={() => handleDeleteSoft(soft.id)} className="btn btn-danger btn-sm" style={{ marginLeft: '10px' }}>
                                         Usun
                                     </button>
+                                    {!soft.emailCanceled && (
+                                        <button onClick={() => handleCancelEmail(soft.id)} className="btn btn-warning btn-sm" style={{ marginLeft: '10px' }}>
+                                            Anuluj email
+                                        </button>
+                                    )}
                                 </td>
                             </tr>
                         ))

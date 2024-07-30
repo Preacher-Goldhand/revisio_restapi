@@ -12,6 +12,7 @@ namespace SoftCheker.Server.Services
         Task<DomainDTO> CreateDomainAsync(DomainDTO domainDto);
         Task<DomainDTO> UpdateDomainAsync(int id, DomainDTO domainDto);
         Task DeleteDomainAsync(int id);
+        Task CancelEmailAsync(int id);
     }
 
 
@@ -69,5 +70,12 @@ namespace SoftCheker.Server.Services
                     await _context.SaveChangesAsync();
                 }
             }
-        }
+            public async Task CancelEmailAsync(int id)
+            {
+                var domain = await _context.Domains.FindAsync(id);
+                domain.EmailCanceled = true;
+                _context.Domains.Update(domain);
+                await _context.SaveChangesAsync();
+            }
     }
+}

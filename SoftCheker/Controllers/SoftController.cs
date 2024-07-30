@@ -54,5 +54,14 @@ namespace SoftCheker.Server.Controllers
             await _softService.DeleteAsync(id);
             return Ok();
         }
+
+        [HttpPost("cancel-email/{id}")]
+        public async Task<IActionResult> CancelEmail(int id)
+        {
+
+            await _softService.CancelEmailAsync(id);
+            return Ok();
+
+        }
     }
 }

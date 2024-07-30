@@ -15,6 +15,7 @@ namespace SoftCheker.Server.Services
         Task<SoftDTO> CreateAsync(SoftDTO soft);
         Task UpdateAsync(int id, SoftDTO soft);
         Task DeleteAsync(int id);
+        Task CancelEmailAsync(int id);
     }
 
     public class SoftService : ISoftService
@@ -62,11 +63,18 @@ namespace SoftCheker.Server.Services
             await _context.SaveChangesAsync();
         }
 
-
         public async Task DeleteAsync(int id)
         {
             var soft = await _context.Softs.FindAsync(id);  
             _context.Softs.Remove(soft);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task CancelEmailAsync(int id)
+        {
+            var soft = await _context.Softs.FindAsync(id);
+            soft.EmailCanceled = true;
+            _context.Softs.Update(soft);
             await _context.SaveChangesAsync();
         }
     }

@@ -1,4 +1,12 @@
-﻿using SoftCheker.Server.Entities;
+﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
+using SoftCheker.Server.Entities;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SoftCheker.Server.Services
 {
@@ -22,34 +30,42 @@ namespace SoftCheker.Server.Services
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation("Email Background Service is running.");
+                // Check if today is Monday
+                var today = DateTime.Now;
+                var isMonday = today.DayOfWeek == DayOfWeek.Monday;
 
-                try
+                // Check if we are in the month before the expiration
+                var currentDate = DateTime.Now;
+                var currentYear = currentDate.Year;
+                var currentMonth = currentDate.Month;
+
+                // Calculate target year and month
+                var nextMonth = (currentMonth % 12) + 1;
+                var targetYear = (nextMonth == 1) ? currentYear + 1 : currentYear;
+
+                if (isMonday)
                 {
-                    using (var scope = _serviceProvider.CreateScope())
+                    _logger.LogInformation("Email Background Service is running.");
+
+                    try
                     {
-                        var dbContext = scope.ServiceProvider.GetRequiredService<SoftChekerDbContext>();
-                        var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
+                        using (var scope = _serviceProvider.CreateScope())
+                        {
+                            var dbContext = scope.ServiceProvider.GetRequiredService<SoftChekerDbContext>();
+                            var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
 
-                        var currentDate = DateTime.Now;
-                        var currentYear = currentDate.Year;
-                        var currentMonth = currentDate.Month;
+                            await CheckAndSendSupportEmailsAsync(dbContext, emailService, targetYear, nextMonth);
+                            await CheckAndSendDomainExpirationEmailsAsync(dbContext, emailService, targetYear, nextMonth);
+                            await CheckAndSendContractExpirationEmailsAsync(dbContext, emailService, targetYear, nextMonth);
+                            await CheckAndSendCertificateExpirationEmailsAsync(dbContext, emailService, targetYear, nextMonth);
 
-                        var nextMonth = (currentMonth % 12) + 1;
-                        var targetYear = (nextMonth == 1) ? currentYear + 1 : currentYear;
-
-                        await CheckAndSendSupportEmailsAsync(dbContext, emailService, targetYear, nextMonth);
-                        await CheckAndSendDomainExpirationEmailsAsync(dbContext, emailService, targetYear, nextMonth);
-                        await CheckAndSendContractExpirationEmailsAsync(dbContext, emailService, targetYear, nextMonth);
-                        await CheckAndSendCertificateExpirationEmailsAsync(dbContext, emailService, targetYear, nextMonth);
-
-                        _logger.LogInformation("Entities checked.");
+                            _logger.LogInformation("Entities checked.");
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "An error occurred while sending warning emails.");
-                    Console.WriteLine($"An error occurred: {ex.Message}");
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "An error occurred while sending warning emails.");
+                    }
                 }
 
                 _logger.LogInformation("Waiting ...");
@@ -70,7 +86,8 @@ namespace SoftCheker.Server.Services
             var products = dbContext.Softs
                 .Where(p =>
                     (p.BasicSupport.Year == targetYear && p.BasicSupport.Month == nextMonth) ||
-                    (p.ExtendedSupport.Year == targetYear && p.ExtendedSupport.Month == nextMonth))
+                    (p.ExtendedSupport.Year == targetYear && p.ExtendedSupport.Month == nextMonth) &&
+                    !p.EmailCanceled)
                 .ToList();
 
             _logger.LogInformation($"Found {products.Count} products nearing end of support.");
@@ -99,7 +116,8 @@ namespace SoftCheker.Server.Services
 
             var domains = dbContext.Domains
                 .Where(d =>
-                    d.ExpiredDate.Year == targetYear && d.ExpiredDate.Month == nextMonth)
+                    d.ExpiredDate.Year == targetYear && d.ExpiredDate.Month == nextMonth &&
+                    !d.EmailCanceled)
                 .ToList();
 
             _logger.LogInformation($"Found {domains.Count} domains nearing expiration.");
@@ -126,7 +144,8 @@ namespace SoftCheker.Server.Services
 
             var contracts = dbContext.Contracts
                 .Where(c =>
-                    c.EndDate.Year == targetYear && c.EndDate.Month == nextMonth)
+                    c.EndDate.Year == targetYear && c.EndDate.Month == nextMonth &&
+                    !c.EmailCanceled)
                 .ToList();
 
             _logger.LogInformation($"Found {contracts.Count} contracts nearing end.");
@@ -152,10 +171,10 @@ namespace SoftCheker.Server.Services
             _logger.LogInformation("Checking for certificates...");
 
             var certs = dbContext.Certs
-        .Where(c =>
-            c.ExpiredDate.Year == targetYear && c.ExpiredDate.Month == nextMonth &&
-            !c.EmailCanceled)  // Sprawdzanie, czy e-mail nie został anulowany
-        .ToList();
+                .Where(c =>
+                    c.ExpiredDate.Year == targetYear && c.ExpiredDate.Month == nextMonth &&
+                    !c.EmailCanceled)
+                .ToList();
 
             _logger.LogInformation($"Found {certs.Count} certificates nearing expiration.");
 
@@ -180,12 +199,11 @@ namespace SoftCheker.Server.Services
             try
             {
                 await emailService.SendWarningEmailAsync(subject, bodyText, bodyHtml);
-                Console.WriteLine($"Email sent: {subject}");
+                _logger.LogInformation($"Email sent: {subject}");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Failed to send email: {subject}");
-                Console.WriteLine($"Failed to send email: {subject}");
             }
         }
     }

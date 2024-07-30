@@ -17,6 +17,7 @@ const DomainList = () => {
     const [showAddForm, setShowAddForm] = useState(false);
     const [editDomain, setEditDomain] = useState(null);
 
+    // Fetch domains from the API
     const fetchDomains = async () => {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -124,6 +125,18 @@ const DomainList = () => {
         }
     };
 
+    const handleCancelEmail = async (id) => {
+        try {
+            await axios.post(`http://localhost:5180/api/domain/cancel-email/${id}`, null, {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            alert('E-mail anulowany!');
+            fetchDomains();
+        } catch (err) {
+            alert('Failed to cancel email.');
+        }
+    };
+
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return isNaN(date.getTime()) ? 'Invalid Date' : date.toLocaleDateString();
@@ -167,6 +180,11 @@ const DomainList = () => {
                                 <td>
                                     <button onClick={() => handleEditDomainClick(domain)} className="btn btn-primary btn-sm">Edytuj</button>
                                     <button onClick={() => handleDeleteDomain(domain.id)} className="btn btn-danger btn-sm" style={{ marginLeft: '10px' }}>Usun</button>
+                                    {!domain.emailCanceled && (
+                                        <button onClick={() => handleCancelEmail(domain.id)} className="btn btn-warning btn-sm" style={{ marginLeft: '10px' }}>
+                                            Anuluj email
+                                        </button>
+                                    )}
                                 </td>
                             </tr>
                         ))

@@ -39,7 +39,7 @@ const Navbar = () => {
                         <Link className="nav-link" to="/smtp" style={linkStyle}> SMTP</Link>
                     </li>
                     <li className="nav-item">
-                        <button className="nav-link btn btn-link" style={linkStyle} onClick={handleLogout}>Wyloguj sie</button>
+                        <button className="nav-link btn btn-link" style={linkStyle} onClick={handleLogout}>Wyloguj</button>
                     </li>
                 </ul>
             </div>

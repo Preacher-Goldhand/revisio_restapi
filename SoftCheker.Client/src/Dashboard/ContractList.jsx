@@ -30,6 +30,7 @@ const ContractList = () => {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             setContracts(response.data);
+            setFilteredContracts(response.data);
             setTotalPages(Math.ceil(response.data.length / itemsPerPage));
             setLoading(false);
         } catch (err) {
@@ -90,9 +91,10 @@ const ContractList = () => {
             await axios.delete(`http://localhost:5180/api/contract/${id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            setContracts(contracts.filter(contract => contract.id !== id));
-            setFilteredContracts(filteredContracts.filter(contract => contract.id !== id));
-            setTotalPages(Math.ceil(filteredContracts.length / itemsPerPage));
+            const updatedContracts = contracts.filter(contract => contract.id !== id);
+            setContracts(updatedContracts);
+            setFilteredContracts(updatedContracts);
+            setTotalPages(Math.ceil(updatedContracts.length / itemsPerPage));
         } catch (err) {
             setError('Failed to delete contract. SprawdŸ konsolê dla wiêcej informacji.');
         }
@@ -119,6 +121,24 @@ const ContractList = () => {
             link.click();
         } catch (err) {
             setError('Failed to generate report. SprawdŸ konsolê dla wiêcej informacji.');
+        }
+    };
+
+    const handleCancelEmail = async (id) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setError('Brak tokenu autoryzacyjnego.');
+            return;
+        }
+
+        try {
+            await axios.post(`http://localhost:5180/api/contract/cancel-email/${id}`, null, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            alert('E-mail anulowany!');
+            fetchContracts();
+        } catch (err) {
+            alert('Failed to cancel email.');
         }
     };
 
@@ -152,7 +172,7 @@ const ContractList = () => {
                         <th>Numer kontraktu</th>
                         <th>Opis</th>
                         <th>Data utworzenia</th>
-                        <th>Data zakomczenia</th>
+                        <th>Data zakonczenia</th>
                         <th>Data odnowienia</th>
                         <th>Cena brutto</th>
                         <th>Akcje</th>
@@ -180,6 +200,15 @@ const ContractList = () => {
                                     <button onClick={() => handleDeleteContract(contract.id)} className="btn btn-danger btn-sm" style={{ marginLeft: '10px' }}>
                                         Usun
                                     </button>
+                                    {contract.emailCanceled ? (
+                                        <button onClick={() => handleResendEmail(contract.id)} className="btn btn-success btn-sm" style={{ marginLeft: '10px' }}>
+                                            Wyœlij ponownie
+                                        </button>
+                                    ) : (
+                                        <button onClick={() => handleCancelEmail(contract.id)} className="btn btn-warning btn-sm" style={{ marginLeft: '10px' }}>
+                                            Anuluj e-mail
+                                        </button>
+                                    )}
                                 </td>
                             </tr>
                         ))

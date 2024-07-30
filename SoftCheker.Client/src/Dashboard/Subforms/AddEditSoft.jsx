@@ -55,14 +55,14 @@ const AddEditSoft = ({ onClose, soft, onSave }) => {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
-            setSuccess(soft ? 'Platforma zostaa zaktualizowana!' : 'Platforma ostaa dodany!');
+            setSuccess(soft ? 'Platforma zosta³a zaktualizowana!' : 'Platforma zosta³a dodana!');
             setError('');
             setTimeout(() => {
                 onSave();
                 onClose();
             }, 1000);
         } catch (err) {
-            setError('Failed to save soft. SprawdŸ konsolê dla wiêcej informacji.');
+            setError('Nie uda³o siê zapisaæ platformy. SprawdŸ konsolê dla wiêcej informacji.');
         }
     };
 
@@ -158,7 +158,7 @@ const AddEditSoft = ({ onClose, soft, onSave }) => {
                     </div>
                     <div style={{ marginTop: '10px' }}>
                         <button type="submit" className="btn btn-primary">
-                            {soft ? 'OK' : 'Dodaj'}
+                            {soft ? 'OK' : 'Dodaj platforme'}
                         </button>
                         <button type="button" onClick={onClose} className="btn btn-secondary" style={{ marginLeft: '10px' }}>
                             Anuluj

@@ -136,7 +136,7 @@ const SoftList = () => {
                     onClick={handleAddSoftClick}
                     className="btn btn-primary"
                 >
-                    Dodaj soft
+                    Dodaj platforme
                 </button>
                 <button
                     onClick={handleGenerateReport}

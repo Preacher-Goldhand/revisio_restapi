@@ -122,6 +122,18 @@ const CertList = () => {
         }
     };
 
+    const handleCancelEmail = async (id) => {
+        try {
+            await axios.post(`http://localhost:5180/api/cert/cancel-email/${id}`, null, {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            alert('E-mail anulowany!');
+            fetchCerts();
+        } catch (err) {
+            alert('Failed to cancel email.');
+        }
+    };
+
     const currentCerts = filteredCerts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     if (loading) return <div>Loading...</div>;
@@ -176,6 +188,11 @@ const CertList = () => {
                                     <button onClick={() => handleDeleteCert(cert.id)} className="btn btn-danger btn-sm" style={{ marginLeft: '10px' }}>
                                         Usun
                                     </button>
+                                        {!cert.emailCanceled && (
+                                            <button onClick={() => handleCancelEmail(cert.id)} className="btn btn-warning btn-sm" style={{ marginLeft: '10px' }}>
+                                                Anuluj email
+                                            </button>
+                                     )}
                                 </td>
                             </tr>
                         ))

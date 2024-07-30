@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SoftCheker.Server.Entities;
@@ -11,9 +12,11 @@ using SoftCheker.Server.Entities;
 namespace SoftCheker.Server.Migrations
 {
     [DbContext(typeof(SoftChekerDbContext))]
-    partial class SoftChekerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240730111453_AddEmailCanceledField")]
+    partial class AddEmailCanceledField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

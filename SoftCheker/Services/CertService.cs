@@ -12,6 +12,7 @@ namespace SoftCheker.Server.Services
         Task<CertDTO> CreateCertAsync(CertDTO certDto);
         Task<CertDTO> UpdateCertAsync(int id, CertDTO certDto);
         Task DeleteCertAsync(int id);
+        Task CancelEmailAsync(int id);
     }
 
     public class CertService : ICertService
@@ -67,6 +68,14 @@ namespace SoftCheker.Server.Services
                 _context.Certs.Remove(cert);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task CancelEmailAsync(int id)
+        {
+            var cert = await _context.Certs.FindAsync(id);
+            cert.EmailCanceled = true;
+            _context.Certs.Update(cert);
+            await _context.SaveChangesAsync();
         }
     }
 }

@@ -152,9 +152,10 @@ namespace SoftCheker.Server.Services
             _logger.LogInformation("Checking for certificates...");
 
             var certs = dbContext.Certs
-                .Where(c =>
-                    c.ExpiredDate.Year == targetYear && c.ExpiredDate.Month == nextMonth)
-                .ToList();
+        .Where(c =>
+            c.ExpiredDate.Year == targetYear && c.ExpiredDate.Month == nextMonth &&
+            !c.EmailCanceled)  // Sprawdzanie, czy e-mail nie został anulowany
+        .ToList();
 
             _logger.LogInformation($"Found {certs.Count} certificates nearing expiration.");
 

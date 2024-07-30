@@ -13,6 +13,7 @@ const SmtpConfig = () => {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [testEmailStatus, setTestEmailStatus] = useState('');
 
     useEffect(() => {
         const fetchConfig = async () => {
@@ -25,11 +26,11 @@ const SmtpConfig = () => {
                     SmtpPort: response.data.smtpPort != null ? response.data.smtpPort.toString() : '',
                     UseSsl: response.data.useSsl || false,
                     SmtpUsername: response.data.smtpUsername || '',
-                    SmtpPassword: response.data.smtpPassword || '', 
+                    SmtpPassword: response.data.smtpPassword || '',
                     RecipientEmail: response.data.recipientEmail || ''
                 });
             } catch (err) {
-                setError('Failed to load SMTP configuration.');
+                setError('Nie uda³o siê za³adowaæ konfiguracji SMTP.');
             } finally {
                 setLoading(false);
             }
@@ -51,17 +52,28 @@ const SmtpConfig = () => {
         try {
             await axios.put('http://localhost:5180/api/smtpconfig', {
                 ...smtpConfig,
-                SmtpPort: parseInt(smtpConfig.SmtpPort, 10) 
+                SmtpPort: parseInt(smtpConfig.SmtpPort, 10)
             }, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
-            alert('Udana konfiguracja SMTP');
+            alert('Konfiguracja SMTP zosta³a pomyœlnie zaktualizowana.');
         } catch (err) {
-            setError('Blad konfiguracji SMTP');
+            setError('Nie uda³o siê zaktualizowaæ konfiguracji SMTP.');
         }
     };
 
-    if (loading) return <div>Loading...</div>;
+    const handleTestEmail = async () => {
+        try {
+            await axios.post('http://localhost:5180/api/email/send', {}, {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            setTestEmailStatus('Testowy email zosta³ pomyœlnie wys³any.');
+        } catch (err) {
+            setTestEmailStatus('Nie uda³o siê wys³aæ testowego emaila.');
+        }
+    };
+
+    if (loading) return <div>£adowanie...</div>;
     if (error) return <div>{error}</div>;
 
     return (
@@ -108,7 +120,7 @@ const SmtpConfig = () => {
                             name="SmtpUsername"
                             value={smtpConfig.SmtpUsername}
                             onChange={handleChange}
-                            placeholder="your_username"
+                            placeholder="twoja_nazwa_uzytkownika"
                             style={{ flex: '1', padding: '8px' }}
                         />
                     </div>
@@ -124,19 +136,25 @@ const SmtpConfig = () => {
                         />
                     </div>
                     <div style={{ marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
-                        <label style={{ flex: '0 0 150px' }}>Email odbiorcy:</label>
+                        <label style={{ flex: '0 0 150px' }}> Email odbiorcy:</label>
                         <input
                             type="email"
                             name="RecipientEmail"
                             value={smtpConfig.RecipientEmail}
                             onChange={handleChange}
-                            placeholder="recipient@example.com"
+                            placeholder="odbiorca@example.com"
                             style={{ flex: '1', padding: '8px' }}
                         />
                     </div>
-                    <button type="submit" style={{ display: 'block', width: '20%', padding: '10px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                        OK
-                    </button>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <button type="submit" style={{ padding: '10px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                            OK
+                        </button>
+                        <button type="button" onClick={handleTestEmail} style={{ padding: '10px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                            Testuj e-mail
+                        </button>
+                    </div>
+                    {testEmailStatus && <div style={{ marginTop: '10px' }}>{testEmailStatus}</div>}
                 </form>
             </div>
         </div>

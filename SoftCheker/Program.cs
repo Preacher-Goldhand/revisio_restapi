@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;  // Dodaj ten using
 using SoftCheker.Server.Entities;
 using SoftCheker.Server.Services;
 using System.Reflection;
@@ -46,7 +47,6 @@ builder.Services.AddScoped<IContractService, ContractService>();
 builder.Services.AddScoped<ICsvGeneratorService, CsvGeneratorService>();
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
@@ -72,7 +72,7 @@ builder.Services.AddAuthentication(x =>
 })
 .AddJwtBearer(x =>
 {
-    x.RequireHttpsMetadata = false; // Set to true in production
+    x.RequireHttpsMetadata = false; 
     x.SaveToken = true;
     x.TokenValidationParameters = new TokenValidationParameters
     {
@@ -85,17 +85,67 @@ builder.Services.AddAuthentication(x =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-// Seed technical user
+// Apply migrations and seed data
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<SoftChekerDbContext>();
+    context.Database.Migrate();
+
+    if (!context.Softs.Any())
+    {
+        context.Softs.Add(new Soft
+        {
+            Id = 1,
+            Name = "Example Software",
+            Description = "Description of Example Software",
+            CurrentVersion = "1.0",
+            BasicSupport = DateTime.UtcNow.AddYears(-1),
+            ExtendedSupport = DateTime.UtcNow.AddYears(1),
+            NextVersion = "1.1"
+        });
+
+        context.SmtpConfigs.Add(new SmtpConfig
+        {
+            Id = 1,
+            SmtpServer = "smtp.example.com",
+            SmtpPort = 587,
+            UseSsl = true,
+            SmtpUsername = "user@example.com",
+            RecipientEmail = "recipient@example.com"
+        });
+
+        context.Domains.Add(new Domain
+        {
+            Id = 1,
+            Name = "example.com",
+            Description = "Example domain",
+            ExpiredDate = DateTime.UtcNow.AddYears(1)
+        });
+
+        context.Certs.Add(new Cert
+        {
+            Id = 1,
+            Name = "SSL Certificate",
+            Description = "SSL Certificate for example.com",
+            IssuedDate = DateTime.UtcNow.AddYears(-1),
+            ExpiredDate = DateTime.UtcNow.AddYears(1)
+        });
+
+        context.Contracts.Add(new Contract
+        {
+            Id = 1,
+            ContractNumber = "12345",
+            Description = "Example contract",
+            StartDate = DateTime.UtcNow.AddMonths(-6),
+            EndDate = DateTime.UtcNow.AddMonths(6),
+            RenewDate = DateTime.UtcNow.AddMonths(5),
+            GrossPrice = 1000.00m
+        });
+
+        await context.SaveChangesAsync();
+    }
+
     var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
 
     var defaultUser = new IdentityUser
@@ -113,6 +163,7 @@ using (var scope = app.Services.CreateScope())
         var createPowerUser = await userManager.CreateAsync(defaultUser, userPassword);
     }
 }
+
 app.UseCors("AllowSpecificOrigin");
 app.UseHttpsRedirection();
 app.UseAuthentication();
